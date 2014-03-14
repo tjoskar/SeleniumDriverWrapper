@@ -5,7 +5,7 @@ setup(
     version='0.1dev',
     author='Oskar Karlsson',
     author_email='kontakta@oskarkarlsson.nu',
-    url='',
+    url='https://github.com/tjoskar/SeleniumDriverWrapper',
     packages=['seleniumdriverwrapper',],
     license='LICENSE.txt',
     install_requires=[
