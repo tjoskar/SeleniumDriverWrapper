@@ -6,15 +6,12 @@ Wrapper for seleniums webdriver
 import time
 import datetime
 from selenium import webdriver
-from selenium.webdriver import Safari, Opera, Chrome, Firefox, PhantomJS
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.common.exceptions import NoSuchElementException, TimeoutException, \
-                                       WebDriverException, ElementNotVisibleException, \
-                                       NoAlertPresentException, InvalidElementStateException
+from selenium.common import exceptions
 
 
 class Driver(object):
@@ -25,13 +22,17 @@ class Driver(object):
                         'chrome': DesiredCapabilities.CHROME,
                         'firefox': DesiredCapabilities.FIREFOX,
                         'android': DesiredCapabilities.ANDROID,
-                        'phatomjs': DesiredCapabilities.PHANTOMJS}
+                        'iphone': DesiredCapabilities.IPHONE,
+                        'ipad': DesiredCapabilities.IPAD,
+                        'phatomjs': DesiredCapabilities.PHANTOMJS,
+                        'ie': DesiredCapabilities.INTERNETEXPLORER}
 
-    __drivers__ = {'safari': Safari,
-                   'opera': Opera,
-                   'chrome': Chrome,
-                   'firefox': Firefox,
-                   'phantomjs': PhantomJS}
+    __drivers__ = {'safari': webdriver.Safari,
+                   'opera': webdriver.Opera,
+                   'chrome': webdriver.Chrome,
+                   'firefox': webdriver.Firefox,
+                   'phantomjs': webdriver.PhantomJS,
+                   'ie': webdriver.Ie}
 
     def __init__(self, driver=None, timeout=5, poll=0.5, delay=0, screenshot_on_failure=False):
         if driver is not None and not isinstance(driver, WebDriver):
@@ -79,17 +80,17 @@ class Driver(object):
         """ Wait for an element to be displayed """
         try:
             WebDriverWait(self.__current_elm, self.timeout, self.poll).until(lambda d: d.is_displayed())
-        except TimeoutException:
-            raise ElementNotVisibleException('Waited for {0} seconds for element to be displayed but it never showed up'.format(self.timeout))
+        except exceptions.TimeoutException:
+            raise exceptions.ElementNotVisibleException('Waited for {0} seconds for element to be displayed but it never showed up'.format(self.timeout))
 
     def _find_elm(self, fun):
         """ Wait and search for en element """
         try:
             self.__current_elm = WebDriverWait(self.__driver, self.timeout, self.poll).until(fun)
             return self
-        except TimeoutException:
+        except exceptions.TimeoutException:
             self.__current_elm = None
-            raise NoSuchElementException('Waited for {0} seconds for element to be displayed but it never showed up'.format(self.timeout))
+            raise exceptions.NoSuchElementException('Waited for {0} seconds for element to be displayed but it never showed up'.format(self.timeout))
 
     def _alert(self):
         """ Helper function, Wait for an alert and return a selenium.webdriver.common.alert.Alert """
@@ -97,10 +98,10 @@ class Driver(object):
         while timeout > 0:
             try:
                 return self.__driver.switch_to_alert()
-            except NoAlertPresentException:
+            except exceptions.NoAlertPresentException:
                 time.sleep(self.poll)
                 timeout = timeout - self.poll
-        raise NoAlertPresentException('Waited for for an alert to be displayed but it never came.'.format(self.timeout))
+        raise exceptions.NoAlertPresentException('Waited for for an alert to be displayed but it never came.'.format(self.timeout))
 
     def _click(self):
         """ Clicks the element """
@@ -211,7 +212,7 @@ class Driver(object):
             if silent:
                 try:
                     self._find_elm(lambda d: d.find_element_by_link_text(text))
-                except NoSuchElementException:
+                except exceptions.NoSuchElementException:
                     pass
                 return self
             else:
@@ -261,12 +262,12 @@ class Driver(object):
         """ Ensure that the text is not on the page """
         try:
             self._find_elm(lambda d: d.find_element_by_xpath(".//*[contains(text(), '%s')]" % (text)))
-        except NoSuchElementException:
+        except exceptions.NoSuchElementException:
             # The element was not found
             return self
         else:
             print self.dump_elm()
-            raise InvalidElementStateException('Text was found')
+            raise exceptions.InvalidElementStateException('Text was found')
 
     def find_by_jquery(self, jquery_selector, iframe_selector=None):
         """ Find element with help of jquery """
@@ -277,7 +278,7 @@ class Driver(object):
 
         try:
             result = self.__driver.execute_script(javascript)
-        except WebDriverException, wde:
+        except exceptions.WebDriverException, wde:
             print "\033[91m" + "Make sure that jQuery is loaded" + "\033[0m"
             raise wde
 
