@@ -49,7 +49,11 @@ class Driver(object):
         try:
             orig_attr = self.__driver.__getattribute__(attr)
         except AttributeError:
-            orig_attr = self.__current_elm.__getattribute__(attr)
+            try:
+                orig_attr = self.__current_elm.__getattribute__(attr)
+            except AttributeError, error:
+                self.die()
+                raise error
 
         if callable(orig_attr):
             def hooked(*args, **kwargs):
