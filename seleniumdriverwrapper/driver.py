@@ -8,7 +8,6 @@ import datetime
 from selenium import webdriver
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common import exceptions
@@ -34,11 +33,10 @@ class Driver(object):
                    'phantomjs': webdriver.PhantomJS,
                    'ie': webdriver.Ie}
 
-    def __init__(self, driver=None, timeout=5, poll=0.5, delay=0, screenshot_on_failure=False):
-        if driver is not None and not isinstance(driver, WebDriver):
-            raise TypeError("Given driver is not an instance of WebDriver")
-        self.__driver = driver
+    def __init__(self, base_url='', timeout=5, poll=0.5, delay=0, screenshot_on_failure=False):
+        self.__driver = None
         self.__current_elm = None
+        self.base_url = base_url
         self.timeout = timeout
         self.poll = poll
         self.delay = delay
@@ -295,6 +293,15 @@ class Driver(object):
     def sleep(self, sec):
         """ Explicit wait """
         time.sleep(sec)
+
+    def go_to(self, url):
+        if not isinstance(url, str):
+            self.die()
+            raise TypeError
+        if url.strip()[:7] == 'http://':
+            self.__driver.get(url)
+        else:
+            self.__driver.get(self.base_url + url)
 
     @property
     def am_on(self):
