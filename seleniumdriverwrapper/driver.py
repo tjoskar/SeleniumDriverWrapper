@@ -9,7 +9,7 @@ from selenium import webdriver
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.remote.webelement import WebElement
-from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.common import exceptions
 
 
@@ -242,6 +242,11 @@ class Driver(object):
             self.__current_elm.send_keys(Keys.RETURN)
         else:
             raise TypeError("No element is selected")
+
+    def select_by_text(self, text):
+        """ Select an element by name """
+        select = Select(self.__current_elm)
+        select.select_by_visible_text(text)
 
     def switch_to_frame(self, id_name=None, class_name=None, name=None):
         """ Switch to frame """
