@@ -154,6 +154,9 @@ class Driver(object):
                 elm_list = [elm_list]
             for elm in elm_list:
                 elm_info += '{0}\n'.format('\n'.join('{0}: {1}'.format(pro, elm.value_of_css_property(pro)) for pro in ['height', 'width', 'display', 'visibility']))
+                elm_info += 'Tag name: {0}\n'.format(elm.tag_name)
+                elm_info += 'Text: {0}\n'.format(elm.text)
+                elm_info += 'ID: {0}\n'.format(elm.id)
                 elm_info += 'Position:\n\tx: {0}\n\ty: {1}\n'.format(elm.location['x'], elm.location['y'])
         else:
             elm_info += 'Element is of nonetype'
@@ -187,10 +190,16 @@ class Driver(object):
         else:
             raise TypeError("No element is selected")
 
-    def find_by_css(self, target, single=True):
+    def find_by_css(self, target, single=True, silent=False):
         """ Find element by css """
         if single:
-            return self._run(self._find_elm, lambda d: d.find_element_by_css_selector(target))
+            if silent:
+                try:
+                    self._find_elm(lambda d: d.find_element_by_css_selector(target))
+                except exceptions.NoSuchElementException:
+                    self.__current_elm = None
+            else:
+                return self._run(self._find_elm, lambda d: d.find_element_by_css_selector(target))
         else:
             return self._run(self._find_elm, lambda d: d.find_elements_by_css_selector(target))
 
@@ -215,7 +224,7 @@ class Driver(object):
                 try:
                     self._find_elm(lambda d: d.find_element_by_link_text(text))
                 except exceptions.NoSuchElementException:
-                    pass
+                    self.__current_elm = None
                 return self
             else:
                 return self._run(self._find_elm, lambda d: d.find_element_by_link_text(text))
@@ -247,6 +256,18 @@ class Driver(object):
         """ Select an element by name """
         select = Select(self.__current_elm)
         select.select_by_visible_text(text)
+
+    def enter(self, string):
+        """ Enter keys """
+        if self.__current_elm is not None:
+            self.__current_elm.send_keys(string)
+        else:
+            raise TypeError("No element is selected")
+
+    def fill_out_textbox(self, input_name, string):
+        """ Fill out a textbox """
+        self.find_by_name(input_name)
+        self.enter(string)
 
     def switch_to_frame(self, id_name=None, class_name=None, name=None):
         """ Switch to frame """
