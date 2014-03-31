@@ -234,16 +234,16 @@ class Driver(object):
     def find_by_text(self, text, tag="*", partial=False, single=True):
         """ Find element by text """
         if partial:
-            return self.find_by_xpath(".//%s[contains(text(), '%s')]" % (tag, text), single)
-        return self.find_by_xpath(".//%s[text()='%s']" % (tag, text), single)
+            return self.find_by_xpath(".//{0}[contains(text(), '{1}')]".format(tag, text), single)
+        return self.find_by_xpath(".//{0}[text()='{1}']".format(tag, text), single)
 
     def find_href(self, url=None, single=False):
         """ Find an element that links to `url` """
-        return self.find_by_xpath(".//a[contains(@href, '%s')]" % (url), single)
+        return self.find_by_xpath(".//a[contains(@href, '{0}}')]".format(url), single)
 
     def find_button(self, value, single=True):
         """ Find button """
-        return self.find_by_xpath(".//input[(@type='submit' or @type='button') and @value='%s']" % value, single)
+        return self.find_by_xpath(".//input[(@type='submit' or @type='button') and @value='{0}']".format(value), single)
 
     def press_enter(self):
         """ Press the enter key """
@@ -289,7 +289,7 @@ class Driver(object):
     def do_not_see(self, text):
         """ Ensure that the text is not on the page """
         try:
-            self._find_elm(lambda d: d.find_element_by_xpath(".//*[contains(text(), '%s')]" % (text)))
+            self._find_elm(lambda d: d.find_element_by_xpath(".//*[contains(text(), '{0}')]".format(text)))
         except exceptions.NoSuchElementException:
             # The element was not found
             return self

@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name='SeleniumDriverWrapper',
-    version='0.2dev',
+    version='0.3dev',
     author='Oskar Karlsson',
     author_email='kontakta@oskarkarlsson.nu',
     url='https://github.com/tjoskar/SeleniumDriverWrapper',
