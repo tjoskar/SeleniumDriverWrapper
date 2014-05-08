@@ -103,7 +103,7 @@ class Driver(object):
             except exceptions.NoAlertPresentException:
                 time.sleep(self.poll)
                 timeout = timeout - self.poll
-        raise exceptions.NoAlertPresentException('Waited for for an alert to be displayed but it never came.'.format(self.timeout))
+        raise exceptions.NoAlertPresentException('Waited for {0} for an alert to be displayed but it never came.'.format(self.timeout))
 
     def _click(self):
         """ Clicks the element """
